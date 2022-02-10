@@ -61,9 +61,20 @@
                 </tr>
             </tbody>
         </table>
+        <!-- 分頁元件 -->
+        <pagination :pages="pagination" @get-products="getProducts"></pagination>
+        <!-- 分頁元件 -->
     </div>
     <!-- Modal -->
     <div id="productModal" ref="productModal" class="modal fade" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <product-modal :temp-product="tempProduct" :is-new="isNew" v-on:get-products="getProducts"></product-modal>
+    </div>
+    <div id="delProductModal" ref="delProductModal" class="modal fade" tabindex="-1" aria-labelledby="delProductModalLabel" aria-hidden="true">
+    <delete-modal :temp-product="tempProduct" v-on:get-products="getProducts"></delete-modal>
+    </div>
+    <!-- Modal -->
+</div>
+<script type="text/x-template" id="templateProductModal">
     <div class="modal-dialog modal-xl">
         <div class="modal-content border-0">
             <div class="modal-header bg-dark text-white">
@@ -120,11 +131,11 @@
                 <div class="row">
                     <div class="mb-3 col-md-6">
                     <label for="origin_price" class="form-label">原價</label>
-                    <input id="origin_price" type="number" min="0" class="form-control" placeholder="請輸入原價" v-model="tempProduct.origin_price">
+                    <input id="origin_price" type="number" min="0" class="form-control" placeholder="請輸入原價" v-model.number="tempProduct.origin_price">
                     </div>
                     <div class="mb-3 col-md-6">
                     <label for="price" class="form-label">售價</label>
-                    <input id="price" type="number" min="0" class="form-control" placeholder="請輸入售價" v-model="tempProduct.price">
+                    <input id="price" type="number" min="0" class="form-control" placeholder="請輸入售價" v-model.number="tempProduct.price">
                     </div>
                 </div>
                 <hr>
@@ -139,7 +150,7 @@
                 </div>
                 <div class="mb-3">
                     <div class="form-check">
-                    <input id="is_enabled" class="form-check-input" type="checkbox" :true-value="1" :false-value="0"v-model="tempProduct.is_enabled">
+                    <input id="is_enabled" class="form-check-input" type="checkbox" :true-value="1" :false-value="0" v-model="tempProduct.is_enabled">
                     <label class="form-check-label" for="is_enabled">是否啟用</label>
                     </div>
                 </div>
@@ -152,8 +163,8 @@
             </div>
         </div>
     </div>
-    </div>
-    <div id="delProductModal" ref="delProductModal" class="modal fade" tabindex="-1" aria-labelledby="delProductModalLabel" aria-hidden="true">
+</script>
+<script type="text/x-template" id="templateDeleteModal">
     <div class="modal-dialog">
         <div class="modal-content border-0">
             <div class="modal-header bg-danger text-white">
@@ -167,9 +178,7 @@
             </div>
         </div>
     </div>
-    </div>
-    <!-- Modal -->
-</div>
+</script>
 <script src="../js/product.js" type="module"></script>
 </body>
 </html>

@@ -1,7 +1,9 @@
 import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.9/vue.esm-browser.js';
+import  pagination  from '../js/pagination.js';
+
 let productModal = null;
 let delProductModal = null;
-const app = {
+const app = createApp({
   data() {
     return {
       url: 'https://vue3-course-api.hexschool.io/v2',
@@ -10,7 +12,8 @@ const app = {
       tempProduct: {
         imagesUrl: [],
       },
-      isNew: false
+      isNew: false,
+      pagination: {}
     }
   },
   methods: {
@@ -25,39 +28,12 @@ const app = {
         window.location = 'login.html';
       })
     },
-    getProducts() {
-      axios.get(this.url + '/api/' + this.path + '/admin/products')
+    getProducts(page = 1) {
+      axios.get(this.url + '/api/' + this.path + '/admin/products/?page=' + page)
         .then((res) => {
           // console.log(res.data);
           this.products = res.data.products;
-        })
-        .catch((error) => {
-          console.dir(error);
-        })
-    },
-    updateProduct() {
-      let id = '';
-      let method = 'post';
-      if (!this.isNew) {
-        method = 'put';
-        id = '/' + this.tempProduct.id;
-      }
-      axios[method](this.url + '/api/' + this.path + '/admin/product' + id, { data: this.tempProduct })
-        .then((res) => {
-          productModal.hide();
-          alert(res.data.message);
-          this.getProducts();
-        })
-        .catch((error) => {
-          console.dir(error);
-        })
-    },
-    delProduct() {
-      axios.delete(this.url + '/api/' + this.path + '/admin/product/' + this.tempProduct.id)
-        .then((res) => {
-          delProductModal.hide();
-          alert(res.data.message);
-          this.getProducts();
+          this.pagination = res.data.pagination;
         })
         .catch((error) => {
           console.dir(error);
@@ -82,10 +58,9 @@ const app = {
         delProductModal.show();
       }
     },
-    addImage() {
-      this.tempProduct.imagesUrl = [];
-      this.tempProduct.imagesUrl.push('');
-    },
+  },
+  components: {
+    pagination
   },
   mounted() {
     // alert("hello");
@@ -102,6 +77,65 @@ const app = {
 
     this.checkLogin()
   }
-};
+});
 
-Vue.createApp(app).mount('#app');
+app.component('productModal', {
+  template: '#templateProductModal',
+  props: ['tempProduct', 'isNew'],
+  data() {
+    return {
+      url: 'https://vue3-course-api.hexschool.io/v2',
+      path: 'testpp',
+    }
+  },
+  methods: {
+    updateProduct() {
+      let id = '';
+      let method = 'post';
+      if (!this.isNew) {
+        method = 'put';
+        id = '/' + this.tempProduct.id;
+      }
+      axios[method](this.url + '/api/' + this.path + '/admin/product' + id, { data: this.tempProduct })
+        .then((res) => {
+          productModal.hide();
+          alert(res.data.message);
+          this.$emit('get-products');
+          // this.getProducts();
+        })
+        .catch((error) => {
+          console.dir(error);
+        })
+    },
+    addImage() {
+      this.tempProduct.imagesUrl = [];
+      this.tempProduct.imagesUrl.push('');
+    },
+  }
+});
+app.component('deleteModal', {
+  template: '#templateDeleteModal',
+  props: ['tempProduct'],
+  data() {
+    return {
+      url: 'https://vue3-course-api.hexschool.io/v2',
+      path: 'testpp',
+    }
+  },
+  methods: {
+    delProduct() {
+      axios.delete(this.url + '/api/' + this.path + '/admin/product/' + this.tempProduct.id)
+        .then((res) => {
+          delProductModal.hide();
+          alert(res.data.message);
+          this.$emit('get-products');
+          // this.getProducts();
+        })
+        .catch((error) => {
+          console.dir(error);
+        })
+    },
+  }
+});
+app.mount('#app');
+// Vue.createApp(app).mount('#app');
